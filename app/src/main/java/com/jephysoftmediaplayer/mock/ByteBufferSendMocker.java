@@ -1,6 +1,7 @@
 package com.jephysoftmediaplayer.mock;
 
 import android.os.Environment;
+import android.os.Looper;
 import android.util.Log;
 
 import com.jephysoftmediaplayer.decode.OnFrameCallBack;
@@ -16,64 +17,174 @@ import java.util.List;
 
 public class ByteBufferSendMocker implements Data{
     private final String TAG = "ByteBufferSendMocker";
+    private final static int START = 0;
+    private final static int PAUSE = 1;
+    private final static int STOP = 2;
+
+
     private List<OnFrameCallBack> observers = new ArrayList<>();
 
-    private File dir = null;
+    private int frameRate = 30;
 
-    public void open(File dir){
-        if (null ==dir ) {
-            dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0724_1549");
-//            dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0722");
+//    private Handler mHandler = new Handler(){
+//        @Override
+//        public void handleMessage(Message msg) {
+//            switch (msg.what){
+//
+//                case START:
+//                    Log.d(TAG, "START：" + Thread.currentThread());
+//                    String fileName = (String) msg.obj;
+//                    break;
+//                case PAUSE:
+//                    Log.d(TAG, "PAUSE：" + Thread.currentThread()+"isPause = "+isPause);
+//
+//                    break;
+//                case STOP:
+//                    Log.d(TAG, "STOP：" + Thread.currentThread()+"isStop = "+isStop);
+//                    break;
+//            }
+//        }
+//    };
+
+    public ByteBufferSendMocker(){
+//        Looper.prepare();
+//        Looper.loop();
+    }
+
+    private File fileDir = null;
+    private Runnable readFrame = new Runnable() {
+        @Override
+        public void run() {
+            {
+                if (fileDir == null) {
+                    fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0724_1549");
+                }
+
+                final File dir = fileDir;
+                int frameNumber = dir.list().length;
+                Log.d(TAG, "文件夹中文件数量" + frameNumber);
+                for (int fileNum = currentPosition; fileNum < frameNumber; fileNum++) {
+                    Log.d(TAG, "读取位置: "+ fileNum);
+                    if (isPause){
+                        currentPosition = fileNum;
+                        break;
+                    }
+                    if (isStop) {
+                        break;
+                    }
+                    File frame = new File(dir, "" + fileNum + "_frame.txt");
+                    readFrame(frame);
+
+                }
+
+            }
         }
+    };
+
+    public void setFrameRate(int frameRate){
+        this.frameRate = frameRate;
+    }
+
+    private volatile boolean isStop = false;
+    private volatile boolean isPause = false;
+
+    //暂停流
+    public void pause(){
+        isPause = true;
+//        mHandler.obtainMessage(PAUSE).sendToTarget();
+
+    }
+
+    //停止流
+    public void close(){
+        isStop = true;
+//        mHandler.obtainMessage(STOP).sendToTarget();
+
+    }
+
+    private static int currentPosition = 0;//记录状态
+//    public void open(File fileDir){
+//        Message message = mHandler.obtainMessage(START);
+//        message.obj = fileDir;
+//        mHandler.sendMessage(message);
+//    }
+
+    public void open(File fileDir){
+        if (fileDir == null) {
+            fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0724_1549");
+        }
+
+        final File dir = fileDir;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mockSendFrame(dir);
+            }
+        }).start();
+
+    }
+
+    private void mockSendFrame(File fileDir) {
+        final File dir = fileDir;
 
         int frameNumber = dir.list().length;
         Log.d(TAG, "文件夹中文件数量" + frameNumber);
-        for (int fileNum=0;fileNum<frameNumber;fileNum++) {
-            File frame = new File(dir,"" + fileNum + "_frame.txt");
-            FileInputStream inputStream =null;
-            BufferedInputStream bis = null;
+        for (int fileNum = currentPosition; fileNum < frameNumber; fileNum++) {
+            Log.d(TAG, "读取位置: "+ fileNum);
+            if (isPause){
+                currentPosition = fileNum;
+                break;
+            }
+            if (isStop) {
+                break;
+            }
+            File frame = new File(dir, "" + fileNum + "_frame.txt");
+            readFrame(frame);
+        }
+    }
+
+    private void readFrame(File frame) {
+        FileInputStream inputStream = null;
+        BufferedInputStream bis = null;
+        try {
+            inputStream = new FileInputStream(frame);
+            bis = new BufferedInputStream(inputStream);
+            int fileLength = bis.available();
+            byte[] bytes = new byte[fileLength];
+            bis.read(bytes);
+            Log.d(TAG, "bytes[0] = " + bytes[0] + "，bytes[1] = " + bytes[1] + "bytes[2] = " + bytes[2]);
+
+            ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+            Log.d(TAG, "Mock读取帧长度： " + byteBuffer.remaining());
             try {
+                int shouldSleep = 1000 / frameRate;
+                Thread.currentThread().sleep(shouldSleep);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            send(byteBuffer);
 
-                inputStream = new FileInputStream(frame);
-                bis = new BufferedInputStream(inputStream);
-                int fileLength = bis.available();
-                byte[] bytes = new byte[fileLength];
-                bis.read(bytes);
-                Log.d(TAG, "bytes[0] = "+bytes[0]+"，bytes[1] = "+bytes[1]+"bytes[2] = "+bytes[2]);
-
-                ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-                Log.d(TAG, "Mock读取帧长度： " + byteBuffer.remaining());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != inputStream) {
                 try {
-                    Thread.currentThread().sleep(20);
-                } catch (InterruptedException e) {
+                    inputStream.close();
+                } catch (IOException e) {
                     e.printStackTrace();
-                }
-                send(byteBuffer);
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }finally {
-                if (null != inputStream) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (null != bis) {
-                    try {
-                        bis.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
 
+            if (null != bis) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
     }
 
     @Override

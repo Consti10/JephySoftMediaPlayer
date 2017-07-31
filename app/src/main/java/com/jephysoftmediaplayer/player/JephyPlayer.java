@@ -8,6 +8,8 @@ import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
 import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
 import com.jephysoftmediaplayer.mock.MockUVCManager;
 
+import java.nio.ByteBuffer;
+
 /**
  * Created by jephy on 7/31/17.
  */
@@ -22,6 +24,7 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     public void prepare(){
         mockUVCManager = MockUVCManager.getInstance();
         uvcSoftDecoder = new UVCSoftDecoder(this);
+        mockUVCManager.setFrameCallback(cameraFrameCallback);
     }
 
     public void start(){
@@ -30,15 +33,23 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     public void pause(){
         //TODO mockUVCManager.pause();
+        mockUVCManager.stopOnDemand();
     }
 
     public void stop(){
-
+        mockUVCManager.closeOnDemand();
     }
 
     public void seekTo(int position){
 
     }
+
+    private MockUVCManager.UVCCameraFrameCallback cameraFrameCallback = new MockUVCManager.UVCCameraFrameCallback() {
+        @Override
+        public void onFrameCallback(ByteBuffer frame) {
+            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frame);
+        }
+    };
 
     long decodeCount = 0;
     long startTime = 0;

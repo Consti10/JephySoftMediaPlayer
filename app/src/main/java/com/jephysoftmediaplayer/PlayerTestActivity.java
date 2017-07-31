@@ -20,21 +20,33 @@ public class PlayerTestActivity extends Activity  {
     private static final int DECODED_SUCCESS = 0;
 
     @BindView(R.id.start_play_bt)
-    Button startDecodeButton;
+    Button startPlayButton;
 
     @BindView(R.id.stop_play_bt)
-    Button stopDecodeButton;
+    Button stopPlayButton;
     private JephyPlayer player;
 
+    @BindView(R.id.pause_play_bt)
+    Button pausePlayButton;
+
     @OnClick(R.id.start_play_bt)
-    void startPlay(Button button){
-        Log.d(TAG, "startPlay");
+    void startPlay(Button button) {
+        Log.d(TAG, "click start button");
         player.start();
     }
 
+    @OnClick(R.id.pause_play_bt)
+    void pausePlay(){
+        Log.d(TAG, "click pause button");
+        player.pause();
+    }
+
     @OnClick(R.id.stop_play_bt)
-    void stopPlay(Button button){
-        Log.d(TAG, "stopPlay");
+    void stopPlay(Button button) {
+
+        Log.d(TAG, "click stop button");
+        player.stop();
+
     }
 
     @Override

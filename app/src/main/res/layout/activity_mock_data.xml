@@ -14,6 +14,15 @@
         android:text="开始播放" />
 
     <Button
+        android:id="@+id/pause_play_bt"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="22sp"
+        android:text="暂停播放" />
+
+    <Button
         android:id="@+id/stop_play_bt"
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"

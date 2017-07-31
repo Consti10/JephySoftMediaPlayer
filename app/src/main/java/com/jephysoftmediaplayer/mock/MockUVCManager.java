@@ -17,6 +17,7 @@ public class MockUVCManager {
     private final String TAG = "MockUVCManager";
 
     public static MockUVCManager instance;
+    private ByteBufferSendMocker byteBufferSendMocker;
 
     private MockUVCManager(){
 
@@ -39,26 +40,28 @@ public class MockUVCManager {
         return instance;
     }
 
-
     /**
      * 模拟uvc开始
      * 从存储卡获取h264帧数据并发送
      */
     public void startOnDemand() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final ByteBufferSendMocker byteBufferSendMocker = new ByteBufferSendMocker();
-                byteBufferSendMocker.register(iFrameCallback);
-                byteBufferSendMocker.open(null);
-            }
-        },"back_data").start();
+            byteBufferSendMocker = new ByteBufferSendMocker();
+            byteBufferSendMocker.register(iFrameCallback);
+        byteBufferSendMocker.open(null);
+    }
 
+    public void stopOnDemand(){
+        byteBufferSendMocker.pause();
+    }
+
+    public void closeOnDemand(){
+        byteBufferSendMocker.close();
     }
 
     private OnFrameCallBack iFrameCallback = new OnFrameCallBack() {
         @Override
         public void onFrame(ByteBuffer frame) {
+            Log.d(TAG, "iFrameCallback: "+frame);
             for (UVCCameraFrameCallback cameraFrameCallback : mFrameCallbacks) {
                 cameraFrameCallback.onFrameCallback(frame);
                 Log.d(TAG, "mock 读取的帧数据："+frame);
