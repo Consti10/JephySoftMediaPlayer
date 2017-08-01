@@ -20,7 +20,11 @@ public class MockUVCManager {
     private ByteBufferSendMocker byteBufferSendMocker;
 
     private MockUVCManager(){
-
+        if (null == byteBufferSendMocker) {
+            byteBufferSendMocker = new ByteBufferSendMocker();
+            byteBufferSendMocker.register(iFrameCallback);
+            new Thread(byteBufferSendMocker).start();
+        }
     }
 
     public interface UVCCameraFrameCallback {
@@ -45,8 +49,6 @@ public class MockUVCManager {
      * 从存储卡获取h264帧数据并发送
      */
     public void startOnDemand() {
-            byteBufferSendMocker = new ByteBufferSendMocker();
-            byteBufferSendMocker.register(iFrameCallback);
         byteBufferSendMocker.open(null);
     }
 

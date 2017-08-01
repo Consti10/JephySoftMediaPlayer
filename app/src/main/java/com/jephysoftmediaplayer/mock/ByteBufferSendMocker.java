@@ -1,7 +1,9 @@
 package com.jephysoftmediaplayer.mock;
 
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import com.jephysoftmediaplayer.decode.OnFrameCallBack;
@@ -15,7 +17,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ByteBufferSendMocker implements Data{
+public class ByteBufferSendMocker implements Data,Runnable{
     private final String TAG = "ByteBufferSendMocker";
     private final static int START = 0;
     private final static int PAUSE = 1;
@@ -26,60 +28,35 @@ public class ByteBufferSendMocker implements Data{
 
     private int frameRate = 30;
 
-//    private Handler mHandler = new Handler(){
+//    private File fileDir = null;
+//    private Runnable readFrame = new Runnable() {
 //        @Override
-//        public void handleMessage(Message msg) {
-//            switch (msg.what){
+//        public void run() {
+//            {
+//                if (fileDir == null) {
+//                    fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0724_1549");
+//                }
 //
-//                case START:
-//                    Log.d(TAG, "START：" + Thread.currentThread());
-//                    String fileName = (String) msg.obj;
-//                    break;
-//                case PAUSE:
-//                    Log.d(TAG, "PAUSE：" + Thread.currentThread()+"isPause = "+isPause);
+//                final File dir = fileDir;
+//                int frameNumber = dir.list().length;
+//                Log.d(TAG, "文件夹中文件数量" + frameNumber);
+//                for (int fileNum = currentPosition; fileNum < frameNumber; fileNum++) {
+//                    Log.d(TAG, "读取位置: "+ fileNum);
+//                    if (isPause){
+//                        currentPosition = fileNum;
+//                        break;
+//                    }
+//                    if (isStop) {
+//                        break;
+//                    }
+//                    File frame = new File(dir, "" + fileNum + "_frame.txt");
+//                    readFrame(frame);
 //
-//                    break;
-//                case STOP:
-//                    Log.d(TAG, "STOP：" + Thread.currentThread()+"isStop = "+isStop);
-//                    break;
+//                }
+//
 //            }
 //        }
 //    };
-
-    public ByteBufferSendMocker(){
-//        Looper.prepare();
-//        Looper.loop();
-    }
-
-    private File fileDir = null;
-    private Runnable readFrame = new Runnable() {
-        @Override
-        public void run() {
-            {
-                if (fileDir == null) {
-                    fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0724_1549");
-                }
-
-                final File dir = fileDir;
-                int frameNumber = dir.list().length;
-                Log.d(TAG, "文件夹中文件数量" + frameNumber);
-                for (int fileNum = currentPosition; fileNum < frameNumber; fileNum++) {
-                    Log.d(TAG, "读取位置: "+ fileNum);
-                    if (isPause){
-                        currentPosition = fileNum;
-                        break;
-                    }
-                    if (isStop) {
-                        break;
-                    }
-                    File frame = new File(dir, "" + fileNum + "_frame.txt");
-                    readFrame(frame);
-
-                }
-
-            }
-        }
-    };
 
     public void setFrameRate(int frameRate){
         this.frameRate = frameRate;
@@ -87,22 +64,19 @@ public class ByteBufferSendMocker implements Data{
 
     private volatile boolean isStop = false;
     private volatile boolean isPause = false;
+    private volatile boolean isPlay = false;
 
     //暂停流
     public void pause(){
-        isPause = true;
-//        mHandler.obtainMessage(PAUSE).sendToTarget();
-
+        mHandler.obtainMessage(PAUSE).sendToTarget();
     }
 
     //停止流
     public void close(){
-        isStop = true;
-//        mHandler.obtainMessage(STOP).sendToTarget();
-
+        mHandler.obtainMessage(STOP).sendToTarget();
     }
 
-    private static int currentPosition = 0;//记录状态
+    private int currentPosition = 0;//记录状态
 //    public void open(File fileDir){
 //        Message message = mHandler.obtainMessage(START);
 //        message.obj = fileDir;
@@ -113,15 +87,15 @@ public class ByteBufferSendMocker implements Data{
         if (fileDir == null) {
             fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0724_1549");
         }
+        Message message = mHandler.obtainMessage(START);
+        message.obj = fileDir;
+        mHandler.sendMessage(message);
+    }
 
+    private void openFileStream(File fileDir){
         final File dir = fileDir;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mockSendFrame(dir);
-            }
-        }).start();
-
+        mockSendFrame(dir);
+        isPlay = true;
     }
 
     private void mockSendFrame(File fileDir) {
@@ -130,7 +104,7 @@ public class ByteBufferSendMocker implements Data{
         int frameNumber = dir.list().length;
         Log.d(TAG, "文件夹中文件数量" + frameNumber);
         for (int fileNum = currentPosition; fileNum < frameNumber; fileNum++) {
-            Log.d(TAG, "读取位置: "+ fileNum);
+            Log.d(TAG, "当前线程："+Thread.currentThread()+", 读取位置: "+ fileNum);
             if (isPause){
                 currentPosition = fileNum;
                 break;
@@ -203,5 +177,42 @@ public class ByteBufferSendMocker implements Data{
     @Override
     public void unRegister(OnFrameCallBack observer) {
         observers.remove(observer);
+    }
+
+    private Handler mHandler = null;
+    @Override
+    public void run() {
+        Looper.prepare();
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+
+                    case START:
+                        Log.d(TAG, "START：" + Thread.currentThread());
+                        if (isPause == true) {
+                            isPause=false;
+                        }
+
+                        if (isStop = true) {
+                            isStop = false;
+                        }
+                        File file = (File) msg.obj;
+                        openFileStream(file);
+                        break;
+                    case PAUSE:
+                        Log.d(TAG, "PAUSE：" + Thread.currentThread()+"isPause = "+isPause);
+                        isPause = true;
+                        break;
+                    case STOP:
+                        Log.d(TAG, "STOP：" + Thread.currentThread()+"isStop = "+isStop);
+                        isStop = true;
+                        break;
+                }
+            }
+        };
+
+        Looper.loop();
+
     }
 }
