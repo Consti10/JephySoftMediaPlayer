@@ -47,7 +47,12 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     private MockUVCManager.UVCCameraFrameCallback cameraFrameCallback = new MockUVCManager.UVCCameraFrameCallback() {
         @Override
         public void onFrameCallback(ByteBuffer frame) {
-            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frame);
+//            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frame);
+            byte[] frameBytes = new byte[frame.remaining()];
+            frame.get(frameBytes);
+            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
+
+            uvcSoftDecoder.decode(frameBytes);
         }
     };
 
