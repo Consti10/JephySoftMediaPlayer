@@ -28,36 +28,6 @@ public class ByteBufferSendMocker implements Data,Runnable{
 
     private int frameRate = 30;
 
-//    private File fileDir = null;
-//    private Runnable readFrame = new Runnable() {
-//        @Override
-//        public void run() {
-//            {
-//                if (fileDir == null) {
-//                    fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_frame_0724_1549");
-//                }
-//
-//                final File dir = fileDir;
-//                int frameNumber = dir.list().length;
-//                Log.d(TAG, "文件夹中文件数量" + frameNumber);
-//                for (int fileNum = currentPosition; fileNum < frameNumber; fileNum++) {
-//                    Log.d(TAG, "读取位置: "+ fileNum);
-//                    if (isPause){
-//                        currentPosition = fileNum;
-//                        break;
-//                    }
-//                    if (isStop) {
-//                        break;
-//                    }
-//                    File frame = new File(dir, "" + fileNum + "_frame.txt");
-//                    readFrame(frame);
-//
-//                }
-//
-//            }
-//        }
-//    };
-
     public void setFrameRate(int frameRate){
         this.frameRate = frameRate;
     }
@@ -69,22 +39,13 @@ public class ByteBufferSendMocker implements Data,Runnable{
     //暂停流
     public void pause(){
         isPause = true;
-//        mHandler.obtainMessage(PAUSE).sendToTarget();
     }
 
     //停止流
     public void close(){
         isStop = true;
         currentPosition = 0;
-//        mHandler.obtainMessage(STOP).sendToTarget();
     }
-
-    private volatile int currentPosition = 0;//记录状态
-//    public void open(File fileDir){
-//        Message message = mHandler.obtainMessage(START);
-//        message.obj = fileDir;
-//        mHandler.sendMessage(message);
-//    }
 
     public void open(File fileDir){
         if (fileDir == null) {
@@ -101,6 +62,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
         isPlay = true;
     }
 
+    private volatile int currentPosition = 0;//记录状态
     private void mockSendFrame(File fileDir) {
         final File dir = fileDir;
 
@@ -215,8 +177,6 @@ public class ByteBufferSendMocker implements Data,Runnable{
                 }
             }
         };
-
         Looper.loop();
-
     }
 }
