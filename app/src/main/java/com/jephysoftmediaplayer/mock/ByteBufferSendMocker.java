@@ -6,7 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.jephysoftmediaplayer.decode.OnFrameCallBack;
+import com.jephysoftmediaplayer.decode.OnFrameCallback;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -24,7 +24,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
     private final static int STOP = 2;
 
 
-    private List<OnFrameCallBack> observers = new ArrayList<>();
+    private List<OnFrameCallback> observers = new ArrayList<>();
 
     private int frameRate = 30;
 
@@ -129,19 +129,19 @@ public class ByteBufferSendMocker implements Data,Runnable{
 
     @Override
     public void send(ByteBuffer byteBuffer) {
-        for (OnFrameCallBack observer :
+        for (OnFrameCallback observer :
                 observers) {
                 observer.onFrame(byteBuffer);
         }
     }
 
     @Override
-    public void register(OnFrameCallBack observer) {
+    public void register(OnFrameCallback observer) {
         observers.add(observer);
     }
 
     @Override
-    public void unRegister(OnFrameCallBack observer) {
+    public void unRegister(OnFrameCallback observer) {
         observers.remove(observer);
     }
 

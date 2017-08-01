@@ -1,6 +1,6 @@
 package com.jephysoftmediaplayer.mock;
 
-import com.jephysoftmediaplayer.decode.OnFrameCallBack;
+import com.jephysoftmediaplayer.decode.OnFrameCallback;
 
 import java.nio.ByteBuffer;
 
@@ -10,6 +10,6 @@ import java.nio.ByteBuffer;
 
 public interface Data {
     void send(ByteBuffer byteBuffer);
-    void register(OnFrameCallBack observer);
-    void unRegister(OnFrameCallBack observer);
+    void register(OnFrameCallback observer);
+    void unRegister(OnFrameCallback observer);
 }

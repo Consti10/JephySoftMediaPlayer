@@ -2,7 +2,7 @@ package com.jephysoftmediaplayer.mock;
 
 import android.util.Log;
 
-import com.jephysoftmediaplayer.decode.OnFrameCallBack;
+import com.jephysoftmediaplayer.decode.OnFrameCallback;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class MockUVCManager {
         byteBufferSendMocker.close();
     }
 
-    private OnFrameCallBack iFrameCallback = new OnFrameCallBack() {
+    private OnFrameCallback iFrameCallback = new OnFrameCallback() {
         @Override
         public void onFrame(ByteBuffer frame) {
             Log.d(TAG, "iFrameCallback: "+frame);
