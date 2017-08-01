@@ -98,7 +98,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
             Log.d(TAG, "Mock读取帧长度： " + byteBuffer.remaining());
             try {
                 int shouldSleep = 1000 / frameRate;
-                Thread.currentThread().sleep(shouldSleep);
+                Thread.currentThread().sleep(0);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
