@@ -63,25 +63,6 @@ public class PlayerTestActivity extends Activity  {
         player.setDisplay(videoRenderLayout);
 
         player.prepare();
-
-//        buttonStart.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        final ByteBufferSendMocker byteBufferSendMocker = new ByteBufferSendMocker();
-//                        byteBufferSendMocker.register(iFrameCallback);
-//                        byteBufferSendMocker.open(null);
-//                    }
-//                },"back_data").start();
-//
-//                new Thread(new DecodeController(new UVCSoftDecoder(PlayerTestActivity.this), frameGroupQueueRepository), "decoder-1").start();
-//                new Thread(new DecodeController(new UVCSoftDecoder(PlayerTestActivity.this), frameGroupQueueRepository), "decoder-2").start();
-//                new Thread(new DecodeController(new UVCSoftDecoder(PlayerTestActivity.this), frameGroupQueueRepository), "decoder-3").start();
-//            }
-//        });
-
     }
 
     @Override
@@ -102,5 +83,4 @@ public class PlayerTestActivity extends Activity  {
             }
 
     };
-
 }
