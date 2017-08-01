@@ -68,11 +68,13 @@ public class ByteBufferSendMocker implements Data,Runnable{
 
     //暂停流
     public void pause(){
+        isPause = true;
         mHandler.obtainMessage(PAUSE).sendToTarget();
     }
 
     //停止流
     public void close(){
+        isStop = true;
         mHandler.obtainMessage(STOP).sendToTarget();
     }
 
