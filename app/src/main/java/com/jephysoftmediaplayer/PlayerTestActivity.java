@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
+import com.evomotion.glrenderview.GlVideoRenderLayout;
 import com.jephysoftmediaplayer.decode.OnFrameCallBack;
 import com.jephysoftmediaplayer.player.JephyPlayer;
 
@@ -18,6 +19,9 @@ public class PlayerTestActivity extends Activity  {
 
     private final String TAG = "PlayerTestActivity";
     private static final int DECODED_SUCCESS = 0;
+
+    @BindView(R.id.vidoe_render_layout)
+    GlVideoRenderLayout videoRenderLayout;
 
     @BindView(R.id.start_play_bt)
     Button startPlayButton;
@@ -56,6 +60,7 @@ public class PlayerTestActivity extends Activity  {
         ButterKnife.bind(this);
 
         player = new JephyPlayer();
+        player.setDisplay(videoRenderLayout);
 
         player.prepare();
 

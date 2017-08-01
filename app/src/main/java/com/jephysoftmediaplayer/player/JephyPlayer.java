@@ -4,6 +4,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.evomotion.glrenderview.GlVideoRenderLayout;
+import com.evomotion.glrenderview.RenderType;
+import com.evomotion.glrenderview.VideoFormat;
 import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
 import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
 import com.jephysoftmediaplayer.mock.MockUVCManager;
@@ -20,11 +23,29 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     private MockUVCManager mockUVCManager;
     private UVCSoftDecoder uvcSoftDecoder;
+    private GlVideoRenderLayout mGlVideoRenderLayout;
+
+    public void setDisplay(GlVideoRenderLayout glVideoRenderLayout){
+        this.mGlVideoRenderLayout = glVideoRenderLayout;
+    }
 
     public void prepare(){
         mockUVCManager = MockUVCManager.getInstance();
         uvcSoftDecoder = new UVCSoftDecoder(this);
         mockUVCManager.setFrameCallback(cameraFrameCallback);
+        initRenderView();
+    }
+
+    private void initRenderView(){
+        mGlVideoRenderLayout.setTouchMode();
+        mGlVideoRenderLayout.setCallback(new GlVideoRenderLayout.GlVideoRenderLayoutCallback() {
+            @Override
+            public int videoFrameFormat() {
+                return VideoFormat.YUV420P;
+            }
+        });
+
+        mGlVideoRenderLayout.setRenderType(RenderType.SPHERE);
     }
 
     public void start(){
@@ -88,6 +109,7 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
                     int width = msg.arg1;
                     int height = msg.arg2;
                     Log.d(TAG, "DECODED_SUCCESS: " + data[0].length);
+                    mGlVideoRenderLayout.displayPixels(data[0], data[1], data[2], width, height);
                     break;
             }
         }
