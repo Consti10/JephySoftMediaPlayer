@@ -55,7 +55,6 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     }
 
     public void pause(){
-        //TODO mockUVCManager.pause();
         mockUVCManager.stopOnDemand();
     }
 
@@ -85,10 +84,6 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     @Override
     public void onDecodeYUVCompeleted(byte[] yData,byte[] uData,byte[] vData, int width, int height,long timeStamp) {
         Log.d(TAG, "解完一帧，所在线程 " + Thread.currentThread());
-//        if (initStartTime) {
-//            startTime = System.currentTimeMillis();
-//        }
-//        initStartTime = false;
         decodeCount ++;
         long averageDecodeTime = (System.currentTimeMillis() - startTime)/decodeCount;
         Log.d(TAG, "平均解码时间" + averageDecodeTime);
