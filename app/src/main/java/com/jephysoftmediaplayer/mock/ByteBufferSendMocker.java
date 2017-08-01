@@ -69,16 +69,17 @@ public class ByteBufferSendMocker implements Data,Runnable{
     //暂停流
     public void pause(){
         isPause = true;
-        mHandler.obtainMessage(PAUSE).sendToTarget();
+//        mHandler.obtainMessage(PAUSE).sendToTarget();
     }
 
     //停止流
     public void close(){
         isStop = true;
-        mHandler.obtainMessage(STOP).sendToTarget();
+        currentPosition = 0;
+//        mHandler.obtainMessage(STOP).sendToTarget();
     }
 
-    private int currentPosition = 0;//记录状态
+    private volatile int currentPosition = 0;//记录状态
 //    public void open(File fileDir){
 //        Message message = mHandler.obtainMessage(START);
 //        message.obj = fileDir;
@@ -112,6 +113,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
                 break;
             }
             if (isStop) {
+                currentPosition = 0;
                 break;
             }
             File frame = new File(dir, "" + fileNum + "_frame.txt");
