@@ -6,10 +6,7 @@ import android.util.Log;
 import android.widget.Button;
 
 import com.evomotion.glrenderview.GlVideoRenderLayout;
-import com.jephysoftmediaplayer.decode.OnFrameCallback;
 import com.jephysoftmediaplayer.player.JephyPlayer;
-
-import java.nio.ByteBuffer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,13 +71,4 @@ public class PlayerTestActivity extends Activity  {
     protected void onResume() {
         super.onResume();
     }
-
-    private OnFrameCallback iFrameCallback = new OnFrameCallback() {
-        @Override
-        public void onFrame(ByteBuffer frame) {
-            byte[] bytes = new byte[frame.remaining()];
-            frame.get(bytes);
-            }
-
-    };
 }

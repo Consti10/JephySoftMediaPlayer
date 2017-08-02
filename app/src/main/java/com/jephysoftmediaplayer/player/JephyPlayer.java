@@ -32,6 +32,7 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     public void prepare(){
         mockUVCManager = MockUVCManager.getInstance();
         uvcSoftDecoder = new UVCSoftDecoder(this);
+
         mockUVCManager.setFrameCallback(cameraFrameCallback);
         initRenderView();
     }
