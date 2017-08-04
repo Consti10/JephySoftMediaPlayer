@@ -8,6 +8,7 @@ import com.evomotion.glrenderview.GlVideoRenderLayout;
 import com.evomotion.glrenderview.RenderType;
 import com.evomotion.glrenderview.VideoFormat;
 import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
+import com.jephysoftmediaplayer.decode.OnFrameCallback;
 import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
 import com.jephysoftmediaplayer.mock.MockUVCManager;
 
@@ -67,9 +68,9 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     }
 
-    private MockUVCManager.UVCCameraFrameCallback cameraFrameCallback = new MockUVCManager.UVCCameraFrameCallback() {
+    private OnFrameCallback cameraFrameCallback = new OnFrameCallback() {
         @Override
-        public void onFrameCallback(ByteBuffer frame) {
+        public void onFrame(ByteBuffer frame) {
 //            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frame);
             byte[] frameBytes = new byte[frame.remaining()];
             frame.get(frameBytes);

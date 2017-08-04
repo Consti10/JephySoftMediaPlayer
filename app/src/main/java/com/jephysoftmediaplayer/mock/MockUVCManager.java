@@ -27,13 +27,9 @@ public class MockUVCManager {
         }
     }
 
-    public interface UVCCameraFrameCallback {
-        void onFrameCallback(ByteBuffer frame);
-    }
+    private List<OnFrameCallback> mFrameCallbacks = new ArrayList<>();
 
-    private List<UVCCameraFrameCallback> mFrameCallbacks = new ArrayList<>();
-
-    public void setFrameCallback(UVCCameraFrameCallback callback) {
+    public void setFrameCallback(OnFrameCallback callback) {
         mFrameCallbacks.add(callback);
     }
 
@@ -64,8 +60,8 @@ public class MockUVCManager {
         @Override
         public void onFrame(ByteBuffer frame) {
             Log.d(TAG, "iFrameCallback: "+frame);
-            for (UVCCameraFrameCallback cameraFrameCallback : mFrameCallbacks) {
-                cameraFrameCallback.onFrameCallback(frame);
+            for (OnFrameCallback cameraFrameCallback : mFrameCallbacks) {
+                cameraFrameCallback.onFrame(frame);
                 Log.d(TAG, "mock 读取的帧数据："+frame);
             }
 
