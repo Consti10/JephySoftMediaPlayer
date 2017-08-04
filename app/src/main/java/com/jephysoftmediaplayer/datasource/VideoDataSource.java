@@ -8,26 +8,11 @@ import com.jephysoftmediaplayer.decode.OnFrameCallback;
 
 public abstract class VideoDataSource implements DataSource{
 
-//    @Override
-//    public abstract void start();
-//
-//    @Override
-//    public abstract void pause();
-//
-//    @Override
-//    public abstract void stop();
-//
-//    @Override
-//    public abstract void seekTo(int second);
-
-
-
-
-    protected OnFrameCallback onFrameCallback;
-
     public void setOnFrameCallback(OnFrameCallback onFrameCallback) {
-        this.onFrameCallback = onFrameCallback;
+        setOnSourceFrameCallback(onFrameCallback);
     }
+
+    protected abstract void setOnSourceFrameCallback(OnFrameCallback onFrameCallback);
 
     protected OnVideoInfoCallback onVideoInfoCallback;
 

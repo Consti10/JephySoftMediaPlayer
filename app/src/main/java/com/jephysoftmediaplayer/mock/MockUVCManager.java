@@ -60,8 +60,8 @@ public class MockUVCManager {
         @Override
         public void onFrame(ByteBuffer frame) {
             Log.d(TAG, "iFrameCallback: "+frame);
-            for (OnFrameCallback cameraFrameCallback : mFrameCallbacks) {
-                cameraFrameCallback.onFrame(frame);
+            for (OnFrameCallback onFrameCallback : mFrameCallbacks) {
+                onFrameCallback.onFrame(frame);
                 Log.d(TAG, "mock 读取的帧数据："+frame);
             }
 

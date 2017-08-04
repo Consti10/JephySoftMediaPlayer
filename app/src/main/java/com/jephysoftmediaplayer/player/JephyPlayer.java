@@ -7,6 +7,8 @@ import android.util.Log;
 import com.evomotion.glrenderview.GlVideoRenderLayout;
 import com.evomotion.glrenderview.RenderType;
 import com.evomotion.glrenderview.VideoFormat;
+import com.jephysoftmediaplayer.datasource.H264FileVideoDataSource;
+import com.jephysoftmediaplayer.datasource.VideoDataSource;
 import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
 import com.jephysoftmediaplayer.decode.OnFrameCallback;
 import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
@@ -22,7 +24,8 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     private static final String TAG = "JephyPlayer";
     private final static int DECODED_SUCCESS = 0;
 
-    private MockUVCManager mockUVCManager;
+//    private MockUVCManager mockUVCManager;
+    private VideoDataSource videoDataSource;
     private UVCSoftDecoder uvcSoftDecoder;
     private GlVideoRenderLayout mGlVideoRenderLayout;
 
@@ -31,12 +34,25 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     }
 
     public void prepare(){
-        mockUVCManager = MockUVCManager.getInstance();
+//        mockUVCManager = MockUVCManager.getInstance();
         uvcSoftDecoder = new UVCSoftDecoder(this);
 
-        mockUVCManager.setFrameCallback(cameraFrameCallback);
+//        mockUVCManager.setFrameCallback(cameraFrameCallback);
+        videoDataSource = new H264FileVideoDataSource();
+        videoDataSource.setOnFrameCallback(onFrameCallback);
         initRenderView();
     }
+
+    private OnFrameCallback onFrameCallback = new OnFrameCallback() {
+        @Override
+        public void onFrame(ByteBuffer frame) {
+            byte[] frameBytes = new byte[frame.remaining()];
+            frame.get(frameBytes);
+            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
+
+            uvcSoftDecoder.decode(frameBytes);
+        }
+    };
 
     private void initRenderView(){
         mGlVideoRenderLayout.setTouchMode();
@@ -53,15 +69,18 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     public void start(){
         startTime = System.currentTimeMillis();
         decodeCount = 0;
-        mockUVCManager.startOnDemand();
+        videoDataSource.start();
+//        mockUVCManager.startOnDemand();
     }
 
     public void pause(){
-        mockUVCManager.stopOnDemand();
+        videoDataSource.pause();
+//        mockUVCManager.stopOnDemand();
     }
 
     public void stop(){
-        mockUVCManager.closeOnDemand();
+        videoDataSource.stop();
+//        mockUVCManager.closeOnDemand();
     }
 
     public void seekTo(int position){

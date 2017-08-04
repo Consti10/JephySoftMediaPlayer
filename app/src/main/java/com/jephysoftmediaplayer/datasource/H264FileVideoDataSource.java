@@ -1,5 +1,6 @@
 package com.jephysoftmediaplayer.datasource;
 
+import com.jephysoftmediaplayer.decode.OnFrameCallback;
 import com.jephysoftmediaplayer.mock.MockUVCManager;
 
 /**
@@ -11,7 +12,6 @@ public class H264FileVideoDataSource extends VideoDataSource {
 
     public H264FileVideoDataSource() {
         this.mockUVCManager = MockUVCManager.getInstance();
-        mockUVCManager.setFrameCallback(onFrameCallback);
     }
 
     @Override
@@ -39,4 +39,8 @@ public class H264FileVideoDataSource extends VideoDataSource {
 
     }
 
+    @Override
+    protected void setOnSourceFrameCallback(OnFrameCallback onFrameCallback) {
+        mockUVCManager.setFrameCallback(onFrameCallback);
+    }
 }

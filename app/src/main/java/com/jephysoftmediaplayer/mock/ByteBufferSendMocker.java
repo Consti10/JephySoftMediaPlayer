@@ -92,7 +92,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
             int fileLength = bis.available();
             byte[] bytes = new byte[fileLength];
             bis.read(bytes);
-            Log.d(TAG, "bytes[0] = " + bytes[0] + "，bytes[1] = " + bytes[1] + "bytes[2] = " + bytes[2]);
+//            Log.d(TAG, "bytes[0] = " + bytes[0] + "，bytes[1] = " + bytes[1] + "bytes[2] = " + bytes[2]);
 
             ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
             Log.d(TAG, "Mock读取帧长度： " + byteBuffer.remaining());
