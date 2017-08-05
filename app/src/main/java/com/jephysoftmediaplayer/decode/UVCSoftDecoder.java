@@ -21,7 +21,13 @@ public class UVCSoftDecoder extends JNIObject{
 
     public int decode(byte[] data){
 
-        return decode(data, data.length);
+        long before = System.currentTimeMillis();
+        int ret = decode(data, data.length);
+        long after = System.currentTimeMillis();
+        long time = after - before;
+        Log.d(TAG, "底层解码时间：" + time);
+
+        return ret;
     }
 
     public void stopDecoder(){
@@ -45,9 +51,9 @@ public class UVCSoftDecoder extends JNIObject{
 
     @Keep
     private void YUVPacket(int width, int height, long timestamp, byte[] y, byte[] u,byte[] v) {
-        Log.d(TAG, "当前线程" + Thread.currentThread());
-        Log.d(TAG, "YUVPacket.........................y.length = "+y.length+" u.length = "+u.length+" v.leangth = "+v.length);
-        Log.d(TAG, "YUVPacket timeStamp = " + timestamp);
+//        Log.d(TAG, "当前线程" + Thread.currentThread());
+//        Log.d(TAG, "YUVPacket.........................y.length = "+y.length+" u.length = "+u.length+" v.leangth = "+v.length);
+//        Log.d(TAG, "YUVPacket timeStamp = " + timestamp);
         onDecodeYUVCompeleted.onDecodeYUVCompeleted(y,u,v,width,height,timestamp);
     }
 

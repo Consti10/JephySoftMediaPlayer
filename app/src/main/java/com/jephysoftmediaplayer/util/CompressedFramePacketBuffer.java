@@ -65,7 +65,11 @@ public class CompressedFramePacketBuffer {
         return frameGroups.poll();
     }
 
-    public int remain(){
+//    public int remain(){
+//        return frameGroups.size();
+//    }
+
+    public int size(){
         return frameGroups.size();
     }
 }

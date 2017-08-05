@@ -9,7 +9,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 
 public class FrameGroup {
-    Queue<ByteBuffer> frameGroup;
+    private Queue<ByteBuffer> frameGroup;
     private int frameGroupMaxSize;
     public FrameGroup(int frameGroupMaxSize) {
         this.frameGroupMaxSize = frameGroupMaxSize;
@@ -34,5 +34,9 @@ public class FrameGroup {
 
     public int size(){
         return frameGroup.size();
+    }
+
+    public  Queue<ByteBuffer> getFrameGroup(){
+        return frameGroup;
     }
 }

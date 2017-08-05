@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.jephysoftmediaplayer.decode.DecodeConsumer;
 import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
 import com.jephysoftmediaplayer.decode.OnFrameCallback;
 import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
@@ -24,7 +25,7 @@ import java.nio.ByteBuffer;
  * 解码控制器后面要考虑加入硬解
  */
 
-public class DecodeController implements OnFrameCallback,Runnable{
+public class DecodeController implements OnFrameCallback{
     public static final String TAG = "DecodeController";
     private final int RECALL_FRAME_SUCCESS = 0;
     private CompressedFramePacketBuffer compressedFramePacketBuffer;
@@ -36,7 +37,10 @@ public class DecodeController implements OnFrameCallback,Runnable{
         decoder = new UVCSoftDecoder(displayer);
         EventBus.getDefault().register(this);
         this.compressedFramePacketBuffer = new CompressedFramePacketBuffer(100,20);
-        new Thread(this).start();
+        new Thread(frameProducer).start();//开启帧数据缓存线程
+        new Thread(new DecodeConsumer(displayer,this.compressedFramePacketBuffer)).start();//开启一个解码器进行解码
+        new Thread(new DecodeConsumer(displayer,this.compressedFramePacketBuffer)).start();//再开启一个解码器进行解码
+        new Thread(new DecodeConsumer(displayer,this.compressedFramePacketBuffer)).start();//再开启一个解码器进行解码
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING)
@@ -58,27 +62,59 @@ public class DecodeController implements OnFrameCallback,Runnable{
 
     }
 
-    @Override
-    public void run() {
-        Looper.prepare();
-        mHandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case RECALL_FRAME_SUCCESS:
-                        ByteBuffer frame = (ByteBuffer) msg.obj;
+//    class DecodeConsumer implements Runnable{
+//
+//        private UVCSoftDecoder decoder;
+//        private CompressedFramePacketBuffer compressedFramePacketBuffer;
+//
+//        public DecodeConsumer(OnDecodeYUVCompeleted yuvConsumer,CompressedFramePacketBuffer compressedFramePacketBuffer) {
+//            this.decoder = new UVCSoftDecoder(yuvConsumer);
+//            this.compressedFramePacketBuffer = compressedFramePacketBuffer;
+//        }
+//
+//        @Override
+//        public void run() {
+//            while (true){
+//
+//            }
+//        }
+//    }
+
+    private Runnable frameConsumer = new Runnable() {
+        @Override
+        public void run() {
+            while (true){
+
+            }
+        }
+    };
+
+    private Runnable frameProducer = new Runnable() {
+        @Override
+        public void run() {
+            Looper.prepare();
+            mHandler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    switch (msg.what) {
+                        case RECALL_FRAME_SUCCESS:
+                            ByteBuffer frame = (ByteBuffer) msg.obj;
 //                        compressedFramePacketBuffer.addFrame(frame);
 //                        Log.d(TAG, "帧组缓存长度："+compressedFramePacketBuffer.remain());
-                        byte[] data = new byte[frame.remaining()];
-                        frame.get(data);
-                        decoder.decode(data);
-                        break;
+                            byte[] data = new byte[frame.remaining()];
+                            frame.get(data);
+                            decoder.decode(data);
+                            break;
+                    }
                 }
-            }
-        };
-        Looper.loop();
+            };
+            Looper.loop();
+        }
+    };
 
-        //在这里创建线程去解码
-
-    }
+//    @Override
+//    public void run() {//生产者线程
+//
+//
+//    }
 }

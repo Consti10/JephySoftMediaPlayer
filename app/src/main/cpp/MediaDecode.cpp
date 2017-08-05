@@ -4,6 +4,7 @@
 
 #include "MediaDecode.h"
 #include "EvoInterface/sei_packet.h"
+#include "android/log.h"
 
 MediaDecode::MediaDecode()
 :decoder(NULL),codecContent(NULL)
@@ -101,8 +102,11 @@ int MediaDecode::decode(uint8_t * data, int32_t size)
             packet.pts = AV_NOPTS_VALUE;
             packet.dts = AV_NOPTS_VALUE;
         }
-
+        int64_t timeBegin = av_gettime()/1000;
         ret = decoder->DecodePacket(&packet,&evoResult);
+        int64_t timeEnd = av_gettime() / 1000;
+        __android_log_print(ANDROID_LOG_INFO,"native MediaDecode","use:%lld",timeEnd - timeBegin);
+
     } else{
         ret = decoder->DecodePacket((EvoPacket*)NULL,&evoResult);
     }
