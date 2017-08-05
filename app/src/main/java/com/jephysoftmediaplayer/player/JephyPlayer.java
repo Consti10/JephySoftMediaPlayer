@@ -12,7 +12,6 @@ import com.jephysoftmediaplayer.datasource.VideoDataSource;
 import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
 import com.jephysoftmediaplayer.decode.OnFrameCallback;
 import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
-import com.jephysoftmediaplayer.mock.MockUVCManager;
 
 import java.nio.ByteBuffer;
 
