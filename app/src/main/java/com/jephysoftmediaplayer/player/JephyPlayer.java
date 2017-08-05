@@ -24,7 +24,6 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     private static final String TAG = "JephyPlayer";
     private final static int DECODED_SUCCESS = 0;
 
-//    private MockUVCManager mockUVCManager;
     private VideoDataSource videoDataSource;
     private UVCSoftDecoder uvcSoftDecoder;
     private GlVideoRenderLayout mGlVideoRenderLayout;
@@ -34,10 +33,8 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     }
 
     public void prepare(){
-//        mockUVCManager = MockUVCManager.getInstance();
         uvcSoftDecoder = new UVCSoftDecoder(this);
 
-//        mockUVCManager.setFrameCallback(cameraFrameCallback);
         videoDataSource = new H264FileVideoDataSource();
         videoDataSource.setOnFrameCallback(onFrameCallback);
         initRenderView();
@@ -70,17 +67,14 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
         startTime = System.currentTimeMillis();
         decodeCount = 0;
         videoDataSource.start();
-//        mockUVCManager.startOnDemand();
     }
 
     public void pause(){
         videoDataSource.pause();
-//        mockUVCManager.stopOnDemand();
     }
 
     public void stop(){
         videoDataSource.stop();
-//        mockUVCManager.closeOnDemand();
     }
 
     public void seekTo(int position){
@@ -90,7 +84,6 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     private OnFrameCallback cameraFrameCallback = new OnFrameCallback() {
         @Override
         public void onFrame(ByteBuffer frame) {
-//            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frame);
             byte[] frameBytes = new byte[frame.remaining()];
             frame.get(frameBytes);
             Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
@@ -101,7 +94,6 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     long decodeCount = 0;
     long startTime = 0;
-//    boolean initStartTime = true;
     @Override
     public void onDecodeYUVCompeleted(byte[] yData,byte[] uData,byte[] vData, int width, int height,long timeStamp) {
         Log.d(TAG, "解完一帧，所在线程 " + Thread.currentThread());
