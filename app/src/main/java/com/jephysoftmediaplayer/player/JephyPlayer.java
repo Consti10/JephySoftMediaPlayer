@@ -25,6 +25,7 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     private VideoDataSource videoDataSource;
     private UVCSoftDecoder uvcSoftDecoder;
+    private DecodeController decodeController;
     private GlVideoRenderLayout mGlVideoRenderLayout;
 
     public void setDisplay(GlVideoRenderLayout glVideoRenderLayout){
@@ -33,6 +34,8 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     public void prepare(){
         uvcSoftDecoder = new UVCSoftDecoder(this);
+        decodeController = new DecodeController();
+
 
         videoDataSource = new H264FileVideoDataSource();
         videoDataSource.setOnFrameCallback(onFrameCallback);
@@ -42,11 +45,12 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     private OnFrameCallback onFrameCallback = new OnFrameCallback() {
         @Override
         public void onFrame(ByteBuffer frame) {
-            byte[] frameBytes = new byte[frame.remaining()];
-            frame.get(frameBytes);
-            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
-
-            uvcSoftDecoder.decode(frameBytes);
+//            byte[] frameBytes = new byte[frame.remaining()];
+//            frame.get(frameBytes);
+//            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
+//
+//            uvcSoftDecoder.decode(frameBytes);
+            decodeController.onFrame(frame);
         }
     };
 
@@ -80,16 +84,16 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     }
 
-    private OnFrameCallback cameraFrameCallback = new OnFrameCallback() {
-        @Override
-        public void onFrame(ByteBuffer frame) {
-            byte[] frameBytes = new byte[frame.remaining()];
-            frame.get(frameBytes);
-            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
-
-            uvcSoftDecoder.decode(frameBytes);
-        }
-    };
+//    private OnFrameCallback cameraFrameCallback = new OnFrameCallback() {
+//        @Override
+//        public void onFrame(ByteBuffer frame) {
+//            byte[] frameBytes = new byte[frame.remaining()];
+//            frame.get(frameBytes);
+//            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
+//
+//            uvcSoftDecoder.decode(frameBytes);
+//        }
+//    };
 
     long decodeCount = 0;
     long startTime = 0;

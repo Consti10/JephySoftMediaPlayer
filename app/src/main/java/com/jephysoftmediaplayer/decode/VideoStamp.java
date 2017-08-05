@@ -27,9 +27,16 @@ public class VideoStamp {
         if (videoStamp.flag == 1) {
             return true;
         }
-
         return false;
     }
 
     public static native VideoStamp Analysis(byte[] data,int size);
+
+//    public static VideoStamp AnalysisStamp(byte[] data,int size)
+//    {
+//        VideoStamp obj = new VideoStamp();
+//        obj.Analysis(data,size);
+//        return obj;
+//    }
+
 }

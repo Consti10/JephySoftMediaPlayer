@@ -164,9 +164,8 @@ private:
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_jephysoftmediaplayer_decode_UVCSoftDecoder_VideoStamp_Analysis(JNIEnv *env, jclass type,
+Java_com_jephysoftmediaplayer_decode_VideoStamp_Analysis(JNIEnv *env, jclass clazz,
                                                             jbyteArray data_, jint size) {
-    jclass clazz = env->FindClass("com/evomotion/player/player/decode/VideoStamp");
     jobject obj = env->AllocObject(clazz);
 
     jbyte *data = env->GetByteArrayElements(data_, NULL);
