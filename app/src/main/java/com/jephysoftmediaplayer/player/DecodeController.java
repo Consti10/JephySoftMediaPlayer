@@ -5,8 +5,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
 import com.jephysoftmediaplayer.decode.OnFrameCallback;
+import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
 import com.jephysoftmediaplayer.util.CompressedFramePacketBuffer;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.nio.ByteBuffer;
 
@@ -24,14 +30,32 @@ public class DecodeController implements OnFrameCallback,Runnable{
     private CompressedFramePacketBuffer compressedFramePacketBuffer;
     private Handler mHandler;
 
-    public DecodeController() {
+    private UVCSoftDecoder decoder;
+
+    public DecodeController(OnDecodeYUVCompeleted displayer) {
+        decoder = new UVCSoftDecoder(displayer);
+        EventBus.getDefault().register(this);
         this.compressedFramePacketBuffer = new CompressedFramePacketBuffer(100,20);
         new Thread(this).start();
     }
 
+    @Subscribe(threadMode = ThreadMode.POSTING)
+    public void onFrameReceived(ByteBuffer frame){
+//        Log.d(TAG, "线程：" + Thread.currentThread());
+//        byte[] data = new byte[frame.remaining()];
+//        frame.get(data);
+//        decoder.decode(data);
+        mHandler.obtainMessage(RECALL_FRAME_SUCCESS,frame).sendToTarget();
+
+    }
+
     @Override
     public void onFrame(ByteBuffer frame) {
+        byte[] data = new byte[frame.remaining()];
+        frame.get(data);
+        decoder.decode(data);
         mHandler.obtainMessage(RECALL_FRAME_SUCCESS,frame).sendToTarget();
+
     }
 
     @Override
@@ -40,15 +64,21 @@ public class DecodeController implements OnFrameCallback,Runnable{
         mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-
                 switch (msg.what) {
                     case RECALL_FRAME_SUCCESS:
-                        compressedFramePacketBuffer.addFrame((ByteBuffer) msg.obj);
-                        Log.d(TAG, "帧组缓存长度："+compressedFramePacketBuffer.remain());
+                        ByteBuffer frame = (ByteBuffer) msg.obj;
+//                        compressedFramePacketBuffer.addFrame(frame);
+//                        Log.d(TAG, "帧组缓存长度："+compressedFramePacketBuffer.remain());
+                        byte[] data = new byte[frame.remaining()];
+                        frame.get(data);
+                        decoder.decode(data);
                         break;
                 }
             }
         };
         Looper.loop();
+
+        //在这里创建线程去解码
+
     }
 }

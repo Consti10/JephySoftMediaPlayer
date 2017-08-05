@@ -38,6 +38,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
 
     //暂停流
     public void pause(){
+        Log.d(TAG, "叫了暂停");
         isPause = true;
     }
 
@@ -98,7 +99,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
             Log.d(TAG, "Mock读取帧长度： " + byteBuffer.remaining());
             try {
                 int shouldSleep = 1000 / frameRate;
-                Thread.currentThread().sleep(0);
+                Thread.currentThread().sleep(shouldSleep);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

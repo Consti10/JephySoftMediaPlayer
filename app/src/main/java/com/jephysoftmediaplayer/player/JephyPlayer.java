@@ -13,6 +13,8 @@ import com.jephysoftmediaplayer.decode.OnDecodeYUVCompeleted;
 import com.jephysoftmediaplayer.decode.OnFrameCallback;
 import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -34,8 +36,7 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     public void prepare(){
         uvcSoftDecoder = new UVCSoftDecoder(this);
-        decodeController = new DecodeController();
-
+        decodeController = new DecodeController(this);
 
         videoDataSource = new H264FileVideoDataSource();
         videoDataSource.setOnFrameCallback(onFrameCallback);
@@ -48,9 +49,10 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 //            byte[] frameBytes = new byte[frame.remaining()];
 //            frame.get(frameBytes);
 //            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
-//
+
 //            uvcSoftDecoder.decode(frameBytes);
-            decodeController.onFrame(frame);
+//            decodeController.onFrame(frame);
+            EventBus.getDefault().post(frame);
         }
     };
 
@@ -74,6 +76,7 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     public void pause(){
         videoDataSource.pause();
+
     }
 
     public void stop(){
@@ -83,17 +86,6 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
     public void seekTo(int position){
 
     }
-
-//    private OnFrameCallback cameraFrameCallback = new OnFrameCallback() {
-//        @Override
-//        public void onFrame(ByteBuffer frame) {
-//            byte[] frameBytes = new byte[frame.remaining()];
-//            frame.get(frameBytes);
-//            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
-//
-//            uvcSoftDecoder.decode(frameBytes);
-//        }
-//    };
 
     long decodeCount = 0;
     long startTime = 0;
