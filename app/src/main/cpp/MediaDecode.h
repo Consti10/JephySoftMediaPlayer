@@ -9,15 +9,16 @@
 #include "EvoInterface/VideoDecoder.h"
 #include "EvoInterface/EvoVideoConvert.h"
 
-class MediaDecode {
+class MediaDecode
+    :protected VideoDecoder
+{
 public:
     MediaDecode();
     ~MediaDecode();
-    int init();
+    int init(int thread_count);
     int decode(uint8_t * data, int32_t size);
     virtual void SendPacket(AVFrame * frame) = 0;
 private:
-    VideoDecoder *decoder;
     EvoVideoConvert convert;
     AVCodecContext	*codecContent;
     AVRational time_base;

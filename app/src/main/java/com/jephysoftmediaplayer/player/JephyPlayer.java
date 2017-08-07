@@ -1,7 +1,10 @@
 package com.jephysoftmediaplayer.player;
 
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.evomotion.glrenderview.GlVideoRenderLayout;
@@ -16,6 +19,7 @@ import com.jephysoftmediaplayer.decode.UVCSoftDecoder;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -37,6 +41,12 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 
     public void prepare(){
         uvcSoftDecoder = new UVCSoftDecoder(this);
+        try {
+            codec = MediaCodec.createDecoderByType("video/avc");
+        } catch (IOException e) {
+            Log.e(TAG, "创建解码器失败");
+            e.printStackTrace();
+        }
         decodeController = new DecodeController(this);
 
         videoDataSource = new H264FileVideoDataSource();
@@ -44,6 +54,7 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
         initRenderView();
     }
 
+    private MediaCodec codec;
     private OnFrameCallback onFrameCallback = new OnFrameCallback() {
         @Override
         public void onFrame(ByteBuffer frame) {
@@ -52,8 +63,9 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
 //            Log.d(TAG, "JephyPlayer onFrameCallbck: "+ frameBytes.length);
 
 //            uvcSoftDecoder.decode(frameBytes);
-//            decodeController.onFrame(frame);
-            EventBus.getDefault().post(frame);
+            decodeController.onFrame(frame);
+//            EventBus.getDefault().post(frame);
+
         }
     };
 

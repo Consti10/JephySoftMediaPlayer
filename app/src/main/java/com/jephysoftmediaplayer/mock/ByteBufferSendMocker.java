@@ -63,6 +63,10 @@ public class ByteBufferSendMocker implements Data,Runnable{
         isPlay = true;
     }
 
+//    long start = 0;
+//    int frameCount = 0;
+//    boolean isFirstDecodeCompleted = true;
+//    long currentTime = 0;
     private volatile int currentPosition = 0;//记录状态
     private void mockSendFrame(File fileDir) {
         final File dir = fileDir;
@@ -80,7 +84,15 @@ public class ByteBufferSendMocker implements Data,Runnable{
                 break;
             }
             File frame = new File(dir, "" + fileNum + "_frame.txt");
+//            frameCount++;
+//            if (isFirstDecodeCompleted) {
+//                start = System.currentTimeMillis();
+//                isFirstDecodeCompleted = false;
+//            }
             readFrame(frame);
+//            currentTime = System.currentTimeMillis();
+//            long averateTime = (currentTime - start)/frameCount;
+//            Log.d(TAG, "io averatetime = "+ averateTime);
         }
     }
 
@@ -99,7 +111,7 @@ public class ByteBufferSendMocker implements Data,Runnable{
             Log.d(TAG, "Mock读取帧长度： " + byteBuffer.remaining());
             try {
                 int shouldSleep = 1000 / frameRate;
-                Thread.currentThread().sleep(shouldSleep);
+                Thread.currentThread().sleep(33);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

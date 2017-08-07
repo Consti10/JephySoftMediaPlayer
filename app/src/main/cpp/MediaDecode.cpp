@@ -7,7 +7,7 @@
 #include "android/log.h"
 
 MediaDecode::MediaDecode()
-:decoder(NULL),codecContent(NULL)
+:VideoDecoder(NULL),codecContent(NULL)
 {
     time_base.num = 0;
     time_base.den = 1;
@@ -15,11 +15,6 @@ MediaDecode::MediaDecode()
 
 MediaDecode::~MediaDecode()
 {
-    if(decoder != NULL)
-    {
-        delete decoder;
-        decoder = NULL;
-    }
     if(codecContent != NULL)
     {
         avcodec_close(codecContent);
@@ -27,22 +22,36 @@ MediaDecode::~MediaDecode()
     }
 }
 
-int MediaDecode::init()
+int MediaDecode::init(int thread_count)
 {
     av_register_all();
 
     AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     if(codec == NULL) return -1;
     codecContent = avcodec_alloc_context3(codec);
+    if(thread_count > 1)
+    {
+        codecContent->active_thread_type = 1;
+        codecContent->thread_count = thread_count;
+    }
+
     int ret = 0;
     if(ret = avcodec_open2(codecContent,codec,NULL) != 0)
     {
         char errbuf[64] = {0};
         av_strerror(ret, errbuf, 64);
+        avcodec_free_context(&codecContent);
+        codecContent = NULL;
         return -1;
     }
+    if(VideoCodecCtx  != NULL)
+    {
+        avcodec_close(VideoCodecCtx);
+        avcodec_free_context(&VideoCodecCtx);
+        VideoCodecCtx = NULL;
+    }
+    VideoCodecCtx = codecContent;
 
-    decoder = new VideoDecoder(codecContent);
 
 //    struct EvoVideoInfo info;
 //    info.Width = 0;
@@ -59,7 +68,7 @@ int MediaDecode::init()
 
 int MediaDecode::decode(uint8_t * data, int32_t size)
 {
-    if (decoder == NULL) return -1;
+    if (VideoCodecCtx == NULL) return -1;
     AVFrame * evoResult = NULL;
     int ret = 0;
     if(data != NULL && size > 0)
@@ -103,12 +112,12 @@ int MediaDecode::decode(uint8_t * data, int32_t size)
             packet.dts = AV_NOPTS_VALUE;
         }
         int64_t timeBegin = av_gettime()/1000;
-        ret = decoder->DecodePacket(&packet,&evoResult);
+        ret = DecodePacket(&packet,&evoResult);
         int64_t timeEnd = av_gettime() / 1000;
         __android_log_print(ANDROID_LOG_INFO,"native MediaDecode","use:%lld",timeEnd - timeBegin);
 
     } else{
-        ret = decoder->DecodePacket((EvoPacket*)NULL,&evoResult);
+        ret = DecodePacket((EvoPacket*)NULL,&evoResult);
     }
     if(evoResult != NULL)
     {
@@ -118,7 +127,7 @@ int MediaDecode::decode(uint8_t * data, int32_t size)
 
         evoResult->pts = timestamp;
         SendPacket(evoResult);
-        FreeAVFrame(&evoResult);
+        FreeFrame(&evoResult);
     }
     return ret;
 }

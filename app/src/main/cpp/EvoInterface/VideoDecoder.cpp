@@ -169,14 +169,14 @@ int  VideoDecoder::DecodePacket(AVPacket *packet, AVFrame **evoResult)
 		}
 
 		AVFrame * retData = av_frame_alloc();
-		int retSize = av_image_alloc(retData->data, retData->linesize, info.Width, info.Height, info.Format, 1);
+		int retSize = CreateFrame(retData, info.Width, info.Height, info.Format);
 
 		if (retSize <= 0)
 		{
 			LOGA("VideoDecoder::DecodePacket:EvoPacketAllocator::CreateAVFrame(%d,%d,%d)==NULL.\n"
 				, info.Width, info.Height, info.Format);
 
-			FreeAVFrame(&retData);
+			FreeFrame(&retData);
 			av_frame_unref(this->VideoFrame);
 			return -1;
 		}
@@ -201,7 +201,7 @@ int  VideoDecoder::DecodePacket(AVPacket *packet, AVFrame **evoResult)
 
 					LOGA("VideoDecoder::DecodePacket:EvoPacketAllocator::av_frame_copy==(%d).\n"
 						, ret);
-					FreeAVFrame(&retData);
+					FreeFrame(&retData);
 					av_frame_unref(this->VideoFrame);
 					return -1;
 				}
@@ -221,7 +221,7 @@ int  VideoDecoder::DecodePacket(AVPacket *packet, AVFrame **evoResult)
 			}
 			else
 			{
-				FreeAVFrame(&retData);
+				FreeFrame(&retData);
 			}
 
 			av_frame_unref(this->VideoFrame);
@@ -231,4 +231,14 @@ int  VideoDecoder::DecodePacket(AVPacket *packet, AVFrame **evoResult)
 	}
 
 	return 0;
+}
+
+int VideoDecoder::CreateFrame(AVFrame *out,int Width, int Height, AVPixelFormat Format)
+{
+	return av_image_alloc(out->data, out->linesize,Width, Height, Format, 1);
+}
+
+void VideoDecoder::FreeFrame(AVFrame **out)
+{
+	FreeAVFrame(out);
 }

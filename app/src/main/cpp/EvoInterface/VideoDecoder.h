@@ -34,7 +34,10 @@ public:
 	{
 		KeepIFrame = keep;
 	}
-private:
+protected:
+	virtual int CreateFrame(AVFrame *out,int Width, int Height, AVPixelFormat Format);
+	virtual void FreeFrame(AVFrame **out);
+protected:
 	AVCodecContext	*VideoCodecCtx;
 	AVFrame         *VideoFrame;
 	bool			KeepIFrame;
