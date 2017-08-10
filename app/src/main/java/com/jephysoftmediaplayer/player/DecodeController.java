@@ -30,6 +30,7 @@ public class DecodeController implements OnFrameCallback{
     private final int RECALL_FRAME_SUCCESS = 0;
     private CompressedFramePacketBuffer compressedFramePacketBuffer;
     private Handler mHandler;
+    private  DecodeConsumer decodeConsumer;
 
 //    private UVCSoftDecoder decoder;
 
@@ -38,7 +39,8 @@ public class DecodeController implements OnFrameCallback{
         EventBus.getDefault().register(this);
         this.compressedFramePacketBuffer = new CompressedFramePacketBuffer(100,20);
         new Thread(frameProducer).start();//开启帧数据缓存线程
-        new Thread(new DecodeConsumer(displayer,this.compressedFramePacketBuffer)).start();//开启一个解码器进行解码
+
+        decodeConsumer = new DecodeConsumer(displayer,this.compressedFramePacketBuffer);
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING)
@@ -49,6 +51,18 @@ public class DecodeController implements OnFrameCallback{
 //        decoder.decode(data);
         mHandler.obtainMessage(RECALL_FRAME_SUCCESS,frame).sendToTarget();
 
+    }
+
+    public void start() {
+        decodeConsumer.start();
+    }
+
+    public void pause(){
+        decodeConsumer.pause();
+    }
+
+    public void stop(){
+        decodeConsumer.stop();
     }
 
     @Override

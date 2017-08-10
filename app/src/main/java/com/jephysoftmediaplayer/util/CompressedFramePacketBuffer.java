@@ -69,6 +69,10 @@ public class CompressedFramePacketBuffer {
 //        return frameGroups.size();
 //    }
 
+    public void removeAll(){
+        frameGroups.clear();
+    }
+
     public int size(){
         return frameGroups.size();
     }

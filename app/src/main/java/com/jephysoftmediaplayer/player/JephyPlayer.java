@@ -85,15 +85,18 @@ public class JephyPlayer implements OnDecodeYUVCompeleted {
         startTime = System.currentTimeMillis();
         decodeCount = 0;
         videoDataSource.start();
+        decodeController.start();
     }
 
     public void pause(){
         videoDataSource.pause();
+        decodeController.pause();
 
     }
 
     public void stop(){
         videoDataSource.stop();
+        decodeController.stop();
     }
 
     public void seekTo(int position){
