@@ -1,5 +1,7 @@
 package com.jephysoftmediaplayer.decode;
 
+import android.util.Log;
+
 import com.jephysoftmediaplayer.util.CompressedFramePacketBuffer;
 
 import java.nio.ByteBuffer;
@@ -10,7 +12,7 @@ import java.util.Queue;
  */
 
 public class DecodeConsumer implements Runnable {
-
+    private final String TAG = "DecodeConsumer";
     private UVCSoftDecoder decoder;
     private CompressedFramePacketBuffer compressedFramePacketBuffer;
 
@@ -26,8 +28,10 @@ public class DecodeConsumer implements Runnable {
                 Queue<ByteBuffer> frameGroup = compressedFramePacketBuffer.getFrameGroup().getFrameGroup();
                 while (!frameGroup.isEmpty()){
                     ByteBuffer frame = frameGroup.poll();
+                    frame.flip();
                     byte[] byteFrame = new byte[frame.remaining()];
                     frame.get(byteFrame);
+                    Log.d(TAG, "消费解码"+byteFrame.length);
                     decoder.decode(byteFrame);
                 }
             }

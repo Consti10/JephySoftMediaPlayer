@@ -31,16 +31,14 @@ public class DecodeController implements OnFrameCallback{
     private CompressedFramePacketBuffer compressedFramePacketBuffer;
     private Handler mHandler;
 
-    private UVCSoftDecoder decoder;
+//    private UVCSoftDecoder decoder;
 
     public DecodeController(OnDecodeYUVCompeleted displayer) {
-        decoder = new UVCSoftDecoder(displayer);
+//        decoder = new UVCSoftDecoder(displayer);
         EventBus.getDefault().register(this);
         this.compressedFramePacketBuffer = new CompressedFramePacketBuffer(100,20);
         new Thread(frameProducer).start();//开启帧数据缓存线程
         new Thread(new DecodeConsumer(displayer,this.compressedFramePacketBuffer)).start();//开启一个解码器进行解码
-        new Thread(new DecodeConsumer(displayer,this.compressedFramePacketBuffer)).start();//再开启一个解码器进行解码
-        new Thread(new DecodeConsumer(displayer,this.compressedFramePacketBuffer)).start();//再开启一个解码器进行解码
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING)
@@ -55,30 +53,12 @@ public class DecodeController implements OnFrameCallback{
 
     @Override
     public void onFrame(ByteBuffer frame) {
-        byte[] data = new byte[frame.remaining()];
-        frame.get(data);
-        decoder.decode(data);
+//        byte[] data = new byte[frame.remaining()];
+//        frame.get(data);
+//        decoder.decode(data);
         mHandler.obtainMessage(RECALL_FRAME_SUCCESS,frame).sendToTarget();
-
     }
 
-//    class DecodeConsumer implements Runnable{
-//
-//        private UVCSoftDecoder decoder;
-//        private CompressedFramePacketBuffer compressedFramePacketBuffer;
-//
-//        public DecodeConsumer(OnDecodeYUVCompeleted yuvConsumer,CompressedFramePacketBuffer compressedFramePacketBuffer) {
-//            this.decoder = new UVCSoftDecoder(yuvConsumer);
-//            this.compressedFramePacketBuffer = compressedFramePacketBuffer;
-//        }
-//
-//        @Override
-//        public void run() {
-//            while (true){
-//
-//            }
-//        }
-//    }
 
     private Runnable frameConsumer = new Runnable() {
         @Override
@@ -99,11 +79,13 @@ public class DecodeController implements OnFrameCallback{
                     switch (msg.what) {
                         case RECALL_FRAME_SUCCESS:
                             ByteBuffer frame = (ByteBuffer) msg.obj;
-//                        compressedFramePacketBuffer.addFrame(frame);
+                            Log.d(TAG, "frame.remaining = "+frame.remaining());
+                            compressedFramePacketBuffer.addFrame(frame);
+
 //                        Log.d(TAG, "帧组缓存长度："+compressedFramePacketBuffer.remain());
-                            byte[] data = new byte[frame.remaining()];
-                            frame.get(data);
-                            decoder.decode(data);
+//                            byte[] data = new byte[frame.remaining()];
+//                            frame.get(data);
+//                            decoder.decode(data);
                             break;
                     }
                 }
@@ -111,10 +93,4 @@ public class DecodeController implements OnFrameCallback{
             Looper.loop();
         }
     };
-
-//    @Override
-//    public void run() {//生产者线程
-//
-//
-//    }
 }
